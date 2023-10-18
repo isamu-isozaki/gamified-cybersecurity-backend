@@ -34,6 +34,7 @@
     "mongodb": "^3.5.9",
     "mongoose": "^6.0.11",
     "multiparty": "^4.2.2",
+    "node-ssh": "^13.1.0",
     "nodemon": "^2.0.12",
     "parse-multipart": "^1.0.4",
     "prettier": "^2.2.1",
