@@ -12,10 +12,15 @@ async function sshConnect () {
 
 async function doCommand (command) {
   return new Promise((resolve, reject) => {
-    ssh.exec('echo $PATH', {
+    ssh.exec(command, {
       out: function (stdout) {
-        console.log("Resolving")
         resolve(stdout)
+      },
+      err: function (stderr) {
+        resolve(stderr) // this-does-not-exist: command not found
+      },
+      exit: function () {
+        resolve('Command exited')
       }
     }).start()
   })
