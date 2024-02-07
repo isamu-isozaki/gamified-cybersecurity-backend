@@ -39,7 +39,8 @@
     "parse-multipart": "^1.0.4",
     "prettier": "^2.2.1",
     "prettier-eslint": "^8.2.2",
-    "simple-ssh": "^1.1.1"
+    "simple-ssh": "^1.1.1",
+    "socket.io": "^4.7.4"
   },
   "devDependencies": {
     "eslint": "^7.25.0",
