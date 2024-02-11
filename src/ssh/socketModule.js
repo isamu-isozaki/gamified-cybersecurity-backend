@@ -21,6 +21,11 @@ module.exports = (server) => {
             socket.emit('commandResult', result);
         });
 
+        socket.on("newMessage", (message) => {
+            console.log("newMessage:", message);
+            socket.emit("messageResponse", "I don't know");
+        })
+
         socket.on('disconnect', () => {
             console.log('User disconnected:', socket.id);
             socket.removeAllListeners();
