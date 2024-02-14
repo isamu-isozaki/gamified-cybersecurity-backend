@@ -49,7 +49,7 @@ async function startExpressApp () {
     res.sendFile(__dirname + '/public/index.html');
 });
 
-  server.listen(APP_PORT, () => {
+server.listen(APP_PORT, () => {
     console.log(`Server listening on port ${APP_PORT}`)
   });
 }
