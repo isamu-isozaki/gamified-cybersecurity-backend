@@ -3,6 +3,9 @@ FROM node:16-bookworm
 WORKDIR /usr/src/app
 COPY . .
 
+ENV labspath /labs
+ENV SSH_HOST attacker
+
 # Install Docker Tools
 RUN apt-get update
 RUN apt-get install -y ca-certificates curl gnupg
