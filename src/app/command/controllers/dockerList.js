@@ -1,16 +1,15 @@
-const Docker = require('dockerode')
+import Docker from 'dockerode';
+import { success } from '../../responses.js';
 
-const docker = new Docker()
+const docker = new Docker();
 
-async function dockerList (req, res) {
-  const containers = await docker.listContainers({
-    all: true,
-    filters: {
-      label: ['heisenberg']
-    }
-  })
+export async function dockerList (req, res) {
+	const containers = await docker.listContainers({
+		all: true,
+		filters: {
+			label: ['heisenberg']
+		}
+	});
 
-  res.success(containers)
+	success(res, containers);
 }
-
-module.exports = { dockerList }

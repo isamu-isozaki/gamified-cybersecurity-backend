@@ -1,9 +1,10 @@
-const util = require('util')
-const exec = util.promisify(require('child_process').exec)
+import util from 'util';
+import { exec } from 'child_process';
+import { success } from '../../responses.js';
 
-async function dockerUp (req, res) {
-  const result = await exec('cd /labs && docker compose up -d')
-  res.success(result)
+const execute = util.promisify(exec);
+
+export async function dockerUp (req, res) {
+	const result = await execute('cd /labs && docker compose up -d');
+	success(res, result);
 }
-
-module.exports = { dockerUp }

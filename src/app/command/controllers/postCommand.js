@@ -1,20 +1,8 @@
-/**
- * Author: Isamu Isozaki
- */
-/**
- *
- * @param {object} req request
- * @param {object} res response
- * Respond with created group
- */
-const { doCommand } = require('@/ssh')
-const sanitize = require('mongo-sanitize')
+import { doCommand } from '../../../ssh/index.js';
+import { success } from '../../responses.js';
 
-async function postCommand (req, res) {
-  sanitize(req.body)
-  const { command } = req.body
-  const terminalOutput = await doCommand(command)
-  res.success({ terminalOutput })
+export async function postCommand (req, res) {
+	const { command } = req.body;
+	const terminalOutput = await doCommand(command);
+	success(res, { terminalOutput });
 }
-
-module.exports = { postCommand }

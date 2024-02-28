@@ -1,57 +1,41 @@
-require('module-alias/register')
+import { APP_PORT } from './src/config/index.js';
+import socketManager from './src/ssh/socketModule.js';
+import cors from 'cors';
+import http from 'http';
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import router from './src/app/router.js';
+import { internalServerError } from './src/app/responses.js';
 
-require('env-smart').load()
+const startExpress = async () => {
+	const app = express();
+	app.use(cors({
+		origin: '*',
+		credentials: true
+	}));
 
-const { APP_PORT } = require('@/config')
-const { sshConnect } = require('@/ssh')
-const socketManager = require('@/ssh/socketModule')
-const cors = require('cors');
-const http = require('http');
+	app.use(express.json());
 
-async function startApp () {
-  startExpressApp()
-  //sshConnect()
-}
+	app.use(cookieParser());
 
-async function startExpressApp () {
-  const express = require('express')
-  const app = express()
-  app.use(cors({
-    origin: '*',
-    credentials: true
-    }));
-  app.use(express.json());
+	const server = http.createServer(app);
+	socketManager(server);
 
-  const cookieParser = require('cookie-parser')
-  app.use(cookieParser())
+	app.use('/v1', router);
 
-  const responsesMiddleware = require('@/middlewares/responses');
-  app.use(responsesMiddleware);
+	// eslint-disable-next-line no-unused-vars
+	app.use((err, req, res, next) => {
+		internalServerError(res, err);
+	});
 
-  const server = http.createServer(app);
-  socketManager(server);
+	server.listen(APP_PORT, () => {
+		console.log(`Server listening on port ${APP_PORT}`);
+	});
+};
 
-  const router = require('@/app/router')
-  app.use('/v1', router)
+const start = async () => {
+	startExpress();
+	//sshConnect()
+};
 
-  app.use((err, req, res, next) => {
-    console.log(err)
-    res.serverError()
-  });
-
-  /* app.use((req, res) => {
-    const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    console.log({fullUrl})
-    res.notFound()
-  }) */
-
-  app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
-});
-
-server.listen(APP_PORT, () => {
-    console.log(`Server listening on port ${APP_PORT}`)
-  });
-}
-
-startApp()
+start();
