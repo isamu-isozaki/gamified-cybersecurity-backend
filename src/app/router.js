@@ -1,12 +1,14 @@
-/**
- * Author: Isamu Isozaki
- */
-const router = require('express').Router()
+import { Router } from 'express';
+import commandRouter from './command/router.js';
+import labsRouter from './routes/labs.js';
+
+const router = Router();
+
 
 /**
  * Command
  */
-const commandRouter = require('./command/router')
-router.use('/command', commandRouter)
+router.use('/command', commandRouter);
+router.use('/labs', labsRouter);
 
-module.exports = router
+export default router;

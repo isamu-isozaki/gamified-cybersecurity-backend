@@ -1,11 +1,11 @@
-const util = require('util')
-const exec = util.promisify(require('child_process').exec)
+import util from 'util';
+import { exec } from 'child_process';
+import { LABS_DIR } from '../../../config/index.js';
+import { success } from '../../responses.js';
 
-const labspath = process.env.labspath || './labs'
+const execute = util.promisify(exec);
 
-async function dockerRestart (req, res) {
-  const result = await exec(`cd ${labspath} && docker compose down && docker compose up -d`)
-  res.success(result)
+export async function dockerRestart (req, res) {
+	const result = await execute(`cd ${LABS_DIR} && docker compose down && docker compose up -d`);
+	success(res, result);
 }
-
-module.exports = { dockerRestart }

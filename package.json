@@ -1,68 +1,48 @@
 {
-  "name": "node-js-recedo",
-  "version": "0.3.0",
-  "description": "A receipt app",
-  "engines": {
-    "node": "12.x"
-  },
+  "name": "gamified-cybersecurity-backend",
+  "version": "0.0.1",
+  "description": "Gamified Cybersecurity Backend",
   "main": "index.js",
+  "exports": "./index.js",
   "proxy": "http://localhost:4000",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
-    "test": "mocha",
     "dev": "nodemon index.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "updatedb": "npx drizzle-kit generate:sqlite"
   },
   "dependencies": {
     "ansi-regex": "^6.0.1",
+    "better-sqlite3": "^9.4.3",
     "body-parser": "^1.19.1",
-    "chai": "^4.2.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dockerode": "^4.0.2",
     "dotenv": "^8.2.0",
+    "drizzle-orm": "^0.29.4",
     "ejs": "^2.5.6",
-    "env-smart": "^2.2.1",
     "express": "^4.17.1",
-    "firebase-admin": "^10.0.2",
-    "joi": "^17.3.0",
-    "lodash": "^4.17.21",
     "mailparser": "^3.4.0",
-    "mocha": "^9.1.3",
-    "module-alias": "^2.2.2",
-    "mongo-sanitize": "^1.1.0",
-    "mongodb": "^3.5.9",
-    "mongoose": "^6.0.11",
     "multiparty": "^4.2.2",
     "node-ssh": "^13.1.0",
     "nodemon": "^2.0.12",
     "parse-multipart": "^1.0.4",
-    "prettier": "^2.2.1",
-    "prettier-eslint": "^8.2.2",
     "simple-ssh": "^1.1.1",
-    "socket.io": "^4.7.4"
+    "socket.io": "^4.7.4",
+    "yaml": "^2.4.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
+    "drizzle-kit": "^0.20.14",
     "eslint": "^7.25.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
-    "request": "^2.81.0",
-    "tape": "^4.7.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5"
   },
   "keywords": [
     "node",
-    "heroku",
     "express"
   ],
-  "license": "MIT",
-  "_moduleAliases": {
-    "@": "src"
-  }
+  "license": "MIT"
 }
