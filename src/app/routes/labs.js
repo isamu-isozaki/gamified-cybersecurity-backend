@@ -9,7 +9,7 @@ import { flagsSchema } from '../../database/schema.js';
 import { findLab, parseLabMetadataFile } from '../../utils/labs.js';
 import { badRequest, notFound, success } from '../responses.js';
 import { LABS_DIR } from '../../config/index.js';
-import { and, eq, lt } from 'drizzle-orm';
+import { and, count, eq, lt } from 'drizzle-orm';
 
 const execute = util.promisify(exec);
 
@@ -29,8 +29,18 @@ const startLab = async (req, res) => {
 		completed: 0
 	}))).onConflictDoNothing();
 
-	const result = await execute(`docker compose -f ${lab.labpath}/docker-compose.yml up -d`);
-	success(res, result);
+	const completedFlags = await db.select({
+		flags: count()
+	}).from(flagsSchema).where(eq(flagsSchema.completed, true)).get();
+
+	await execute(`docker compose -f ${lab.labpath}/docker-compose.yml up -d`);
+	success(res, {
+		lab: {
+			...lab.labdata,
+			flags: lab.labdata.flags.length,
+			completedFlags: completedFlags?.flags || 0
+		}
+	});
 };
 
 const stopLab = async (req, res) => {
@@ -91,7 +101,7 @@ const submitFlag = async (req, res) => {
 
 	const db = getLabDatabase(lab.labpath);
 
-	const flagRow = await db.select().from(flagsSchema).where(eq(flagsSchema.flagHash, flag)).limit(1).get();
+	const flagRow = await db.select().from(flagsSchema).where(eq(flagsSchema.flagHash, flag)).get();
 	if(flagRow) {
 		let previousOutstandingFlag;
 		if(lab.labdata.submit_flags_in_order) {
@@ -102,7 +112,15 @@ const submitFlag = async (req, res) => {
 			await db.update(flagsSchema).set({
 				completed: true
 			}).where(eq(flagsSchema.id, flagRow.id));
-			return success(res, 'Correct flag');
+
+			const completedFlags = await db.select({
+				flags: count()
+			}).from(flagsSchema).where(eq(flagsSchema.completed, true)).get();
+
+			return success(res, {
+				message: 'Correct flag',
+				completedFlags: completedFlags?.flags || 0
+			});
 		}
 	}
 

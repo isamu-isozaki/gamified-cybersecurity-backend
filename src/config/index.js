@@ -5,4 +5,4 @@ export const SSH_HOST = process.env.SSH_HOST || 'localhost';
 export const SSH_USER = process.env.SSH_USER || 'kali';
 export const SSH_PASS = process.env.SSH_PASS || 'kali';
 export const SSH_PORT = process.env.SSH_PORT || 2222;
-export const LABS_DIR = process.env.LABS_DIR || 'C:\\Users\\Rick\\code\\heisenberg\\labs';
+export const LABS_DIR = process.env.LABS_DIR || '../labs';
