@@ -90,6 +90,23 @@ const getLab = async (req, res) => {
 	});
 };
 
+const resetLab = async (req, res) => {
+	const name = req.params.name;
+	
+	const lab = await findLab(name);
+	if(lab === null) {
+		return notFound(res, 'Lab not found');
+	}
+
+	await execute(`docker compose -f ${lab.labpath}/docker-compose.yml down`);
+
+	await fs.promises.unlink(`${lab.labpath}/progress.db`);
+
+	success(res, {
+		message: `${lab.labdata.name} reset`
+	});
+};
+
 const submitFlag = async (req, res) => {
 	const name = req.params.name;
 	const flag = req.body.flag;
@@ -124,7 +141,9 @@ const submitFlag = async (req, res) => {
 		}
 	}
 
-	badRequest(res, 'Incorrect flag');
+	badRequest(res, {
+		message: 'Incorrect flag'
+	});
 };
 
 const router = Router();
@@ -133,6 +152,7 @@ router.get('/', listLabs);
 router.get('/:name', getLab);
 router.post('/:name/start', startLab);
 router.post('/:name/stop', stopLab);
+router.post('/:name/reset', resetLab);
 router.post('/:name/submit', submitFlag);
 
 export default router;

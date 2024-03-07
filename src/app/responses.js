@@ -7,8 +7,8 @@ export const internalServerError = (res, error) => {
 	res.status(500).json({ message: 'Internal Server Error' });
 };
 
-export const notFound = (res) => {
-	res.status(404).json({ message: 'Not Found' });
+export const notFound = (res, message) => {
+	res.status(404).json({ message: message || 'Not Found' });
 };
 
 export const badRequest = (res, message) => {

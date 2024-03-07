@@ -26,11 +26,10 @@
     "express": "^4.17.1",
     "mailparser": "^3.4.0",
     "multiparty": "^4.2.2",
-    "node-ssh": "^13.1.0",
     "nodemon": "^2.0.12",
     "parse-multipart": "^1.0.4",
-    "simple-ssh": "^1.1.1",
     "socket.io": "^4.7.4",
+    "ssh2": "^1.15.0",
     "yaml": "^2.4.0",
     "zod": "^3.22.4"
   },

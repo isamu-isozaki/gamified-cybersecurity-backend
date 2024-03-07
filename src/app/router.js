@@ -1,14 +1,10 @@
 import { Router } from 'express';
-import commandRouter from './command/router.js';
+import dockerRouter from './routes/docker.js';
 import labsRouter from './routes/labs.js';
 
 const router = Router();
 
-
-/**
- * Command
- */
-router.use('/command', commandRouter);
 router.use('/labs', labsRouter);
+router.use('/docker', dockerRouter);
 
 export default router;
