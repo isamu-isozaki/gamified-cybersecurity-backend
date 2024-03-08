@@ -1,0 +1,50 @@
+const responses = [
+  'Say my name, then encrypt it. - Walter White',
+  'We need to cook... up some strong passwords, yo. - Jesse Pinkman',
+  'The purity of our product must match the integrity of our firewalls. - Walter White',
+  'Two-factor authentication, bitch! - Jesse Pinkman',
+  'Control the market, control the access. Gatekeepers to the digital realm. - Walter White',
+  'Man, phishing scams are like, the bottom of the barrel, yo. - Jesse Pinkman',
+  'A meticulous approach is what distinguishes us from the amateurs. - Walter White',
+  "Gotta keep our communications off the DEA's radar... I mean, hackers. - Jesse Pinkman",
+  'In the empire business, data is king. - Walter White',
+  'Hackers? More like, total losers, yo. - Jesse Pinkman',
+  "Control the variables, control the security. That's the key to cyber resilience. - Walter White",
+  "Yo, phishing scams are like, the bottom of the barrel, man. Don't fall for that. - Jesse Pinkman",
+  "The purity of your security measures, that's what makes you stand out. 99.1% effective isn't enough. - Walter White",
+  'Two-factor authentication, yo. Gotta have that extra layer, like, for everything. - Jesse Pinkman',
+  "A firewall alone isn't an empire business. You need strategy, Jesse. - Walter White",
+  'Hackers are like, roaches, yo. Squash one, and ten more pop up. - Jesse Pinkman',
+  "Remember, Jesse, fear of a threat is good. It means you're finally starting to understand the stakes. - Walter White",
+  "Man, social engineering's wicked, yo. It's like they're playing mind games. - Jesse Pinkman",
+  "It's not just about securing the present, but ensuring the future. That's legacy. - Walter White",
+  "Public WiFi's risky business, yo. Like cooking in a stranger's RV. - Jesse Pinkman",
+  "Cybersecurity's my territory. Encryption's the name of the game. - Hank Schrader",
+  "I'm on the hunt for malware, like I hunt for Heisenberg. - Hank Schrader",
+  'VPN tunnels, gotta dig deep to stay hidden from these cyber criminals. - Hank Schrader',
+  'Think you can breach this network? Not on my watch, buddy. - Hank Schrader',
+  'Gonna need more than Schraderbrau to deal with these hackers. - Hank Schrader',
+  'Need to keep your data safe? Better call Saul, I know a guy who knows a guy. - Saul Goodman',
+  "In the digital world, it's not a crime if you're not caught... encrypt accordingly. - Saul Goodman",
+  'Remember, a good firewall keeps the bad guys out and your questionable choices in. - Saul Goodman',
+  "Phishing emails? Please, I've talked my way out of tougher jams than that. - Saul Goodman",
+  'Keep your friends close, but your passwords closer. And never, ever write them down. - Saul Goodman',
+  'In the business of security, there is no room for error. Our networks must be as impeccable as Los Pollos Hermanos. - Gustavo Fring',
+  'A robust cybersecurity protocol is the hallmark of a well-run operation. Discretion is key. - Gustavo Fring',
+  'Like a fine establishment, our data must be clean, organized, and above all, protected. - Gustavo Fring',
+  'To survive in this world, one must blend in, yet stand apart. The same applies to our digital footprint. - Gustavo Fring',
+  "Let's just say, when it comes to cybersecurity, I prefer to keep my enemies in the dark. - Gustavo Fring",
+  'No half measures when it comes to securing your network. Full measures only. - Mike Ehrmantraut',
+  'Keep your eyes open, ears to the ground, and always update your security patches. - Mike Ehrmantraut',
+  'You want to stay off the radar? Good operational security is your best friend. - Mike Ehrmantraut',
+  'Remember, kid, a secure password is like a good stakeout spot - hard to guess and harder to crack. - Mike Ehrmantraut',
+  'In this game, the quiet ones are the ones who last. Keep your data encrypted and your mouth shut. - Mike Ehrmantraut',
+];
+
+export const onChatMessage = async (socket, labName, message) => {
+  // TODO process message
+  socket.emit(
+    'chatResponse',
+    responses[Math.floor(Math.random() * responses.length)]
+  );
+};

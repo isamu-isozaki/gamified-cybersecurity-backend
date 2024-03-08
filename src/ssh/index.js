@@ -1,27 +1,21 @@
+import { Server } from 'socket.io';
+import { onLabStart } from './lab.js';
 
-import SSH from 'simple-ssh';
+export default (server) => {
+  const io = new Server(server, {
+    cors: {
+      origin: '*', // 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+    },
+  });
 
-import { SSH_HOST, SSH_PORT, SSH_USER, SSH_PASS } from '../config/index.js';
-let ssh = null;
+  io.on('connection', async (socket) => {
+    console.log('[socket] connected:', socket.id);
+    socket.on('labStart', (labName) => onLabStart(socket, labName));
 
-export async function sshConnect () {
-	console.log('[ssh] Connecting to ssh...');
-	ssh = new SSH({ host: SSH_HOST, user: SSH_USER, pass: SSH_PASS, port: SSH_PORT });
-	console.log('[ssh] Connection established');
-}
-
-export async function doCommand (command) {
-	return new Promise((resolve) => {
-		ssh.exec(command, {
-			out: function (stdout) {
-				resolve(stdout);
-			},
-			err: function (stderr) {
-				resolve(stderr); // this-does-not-exist: command not found
-			},
-			exit: function () {
-				resolve('Command exited');
-			}
-		}).start();
-	});
-}
+    socket.on('disconnect', () => {
+      console.log('[socket] disconnected:', socket.id);
+      socket.removeAllListeners();
+    });
+  });
+};
