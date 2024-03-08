@@ -14,136 +14,185 @@ import { and, count, eq, lt } from 'drizzle-orm';
 const execute = util.promisify(exec);
 
 const startLab = async (req, res) => {
-	const name = req.params.name;
-	
-	const lab = await findLab(name);
-	if(lab === null) {
-		return notFound(res, 'Lab not found');
-	}
+  const name = req.params.name;
 
-	const db = getLabDatabase(lab.labpath);
+  const lab = await findLab(name);
+  if (lab === null) {
+    return notFound(res, 'Lab not found');
+  }
 
-	await db.insert(flagsSchema).values(lab.labdata.flags.map((flag, i) => ({
-		id: i,
-		flagHash: flag,
-		completed: 0
-	}))).onConflictDoNothing();
+  const db = getLabDatabase(lab.path);
 
-	const completedFlags = await db.select({
-		flags: count()
-	}).from(flagsSchema).where(eq(flagsSchema.completed, true)).get();
+  await db
+    .insert(flagsSchema)
+    .values(
+      lab.data.flags.map((flag, i) => ({
+        id: i,
+        flagHash: flag,
+        completed: 0,
+      }))
+    )
+    .onConflictDoNothing();
 
-	await execute(`docker compose -f ${lab.labpath}/docker-compose.yml up -d`);
-	success(res, {
-		lab: {
-			...lab.labdata,
-			flags: lab.labdata.flags.length,
-			completedFlags: completedFlags?.flags || 0
-		}
-	});
+  const completedFlags = await db
+    .select({
+      flags: count(),
+    })
+    .from(flagsSchema)
+    .where(eq(flagsSchema.completed, true))
+    .get();
+
+  try {
+    await execute(
+      `docker compose -f ${lab.path}/docker-compose.yml up -d --force-recreate`
+    );
+  } catch (e) {
+    console.error(e);
+  }
+
+  success(res, {
+    lab: {
+      ...lab.data,
+      flags: lab.data.flags.length,
+      completedFlags: completedFlags?.flags || 0,
+    },
+  });
 };
 
 const stopLab = async (req, res) => {
-	const name = req.params.name;
-	
-	const lab = await findLab(name);
-	if(lab === null) {
-		return notFound(res, 'Lab not found');
-	}
+  const name = req.params.name;
 
-	const result = await execute(`docker compose -f ${lab.labpath}/docker-compose.yml down`);
-	success(res, result);
+  const lab = await findLab(name);
+  if (lab === null) {
+    return notFound(res, 'Lab not found');
+  }
+
+  try {
+    await execute(`docker compose -f ${lab.path}/docker-compose.yml down`);
+  } catch (e) {
+    console.error(e);
+  }
+  success(res, {
+    message: `${lab.data.name} stopped`,
+  });
 };
 
 const listLabs = async (req, res) => {
-	const files = await fs.promises.readdir(LABS_DIR);
-	const labs = [];
-    
-	for (let i = 0; i < files.length; i++) {
-		const file = files[i];
-		const stats = await fs.promises.lstat(path.join(LABS_DIR, file));
-		if (stats.isDirectory()) {
-			const metadata = await parseLabMetadataFile(file);
+  const files = await fs.promises.readdir(LABS_DIR);
+  const labs = [];
 
-			if(metadata) {
-				labs.push(metadata);
-			}
-		}
-	}
-	success(res, labs);
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const stats = await fs.promises.lstat(path.join(LABS_DIR, file));
+    if (stats.isDirectory()) {
+      const metadata = await parseLabMetadataFile(file);
+
+      if (metadata) {
+        labs.push(metadata);
+      }
+    }
+  }
+  success(res, labs);
 };
 
 const getLab = async (req, res) => {
-	const name = req.params.name;
-	const lab = await findLab(name);
-	if(lab === null) {
-		return notFound(res, 'Lab not found');
-	}
+  const name = req.params.name;
+  const lab = await findLab(name);
+  if (lab === null) {
+    return notFound(res, 'Lab not found');
+  }
 
-	const db = getLabDatabase(lab.labpath);
+  const db = getLabDatabase(lab.path);
 
-	const flags = await db.select().from(flagsSchema).all();
+  const flags = await db.select().from(flagsSchema).all();
 
-	success(res, {
-		lab: lab.labdata,
-		flags
-	});
+  success(res, {
+    lab: lab.data,
+    flags,
+  });
 };
 
 const resetLab = async (req, res) => {
-	const name = req.params.name;
-	
-	const lab = await findLab(name);
-	if(lab === null) {
-		return notFound(res, 'Lab not found');
-	}
+  const name = req.params.name;
 
-	await execute(`docker compose -f ${lab.labpath}/docker-compose.yml down`);
+  const lab = await findLab(name);
+  if (lab === null) {
+    return notFound(res, 'Lab not found');
+  }
 
-	await fs.promises.unlink(`${lab.labpath}/progress.db`);
+  try {
+    await execute(`docker compose -f ${lab.path}/docker-compose.yml down`);
+  } catch (e) {
+    console.error(e);
+  }
 
-	success(res, {
-		message: `${lab.labdata.name} reset`
-	});
+  try {
+    // TODO do something if this fails, return an error
+    await fs.promises.unlink(`${lab.path}/progress.db`);
+  } catch (e) {
+    console.error(e);
+  }
+
+  success(res, {
+    message: `${lab.data.name} reset`,
+  });
 };
 
 const submitFlag = async (req, res) => {
-	const name = req.params.name;
-	const flag = req.body.flag;
+  const name = req.params.name;
+  const flag = req.body.flag;
 
-	const lab = await findLab(name);
-	if(lab === null) {
-		return notFound(res, 'Lab not found');
-	}
+  const lab = await findLab(name);
+  if (lab === null) {
+    return notFound(res, 'Lab not found');
+  }
 
-	const db = getLabDatabase(lab.labpath);
+  const db = getLabDatabase(lab.path);
 
-	const flagRow = await db.select().from(flagsSchema).where(eq(flagsSchema.flagHash, flag)).get();
-	if(flagRow) {
-		let previousOutstandingFlag;
-		if(lab.labdata.submit_flags_in_order) {
-			previousOutstandingFlag = await db.select().from(flagsSchema).where(and(lt(flagsSchema.id, flagRow.id), eq(flagsSchema.completed, false))).limit(1).get();
-		}
+  const flagRow = await db
+    .select()
+    .from(flagsSchema)
+    .where(eq(flagsSchema.flagHash, flag))
+    .get();
+  if (flagRow) {
+    let previousOutstandingFlag;
+    if (lab.data.submit_flags_in_order) {
+      previousOutstandingFlag = await db
+        .select()
+        .from(flagsSchema)
+        .where(
+          and(lt(flagsSchema.id, flagRow.id), eq(flagsSchema.completed, false))
+        )
+        .limit(1)
+        .get();
+    }
 
-		if(!previousOutstandingFlag) {
-			await db.update(flagsSchema).set({
-				completed: true
-			}).where(eq(flagsSchema.id, flagRow.id));
+    if (!previousOutstandingFlag) {
+      await db
+        .update(flagsSchema)
+        .set({
+          completed: true,
+        })
+        .where(eq(flagsSchema.id, flagRow.id));
 
-			const completedFlags = await db.select({
-				flags: count()
-			}).from(flagsSchema).where(eq(flagsSchema.completed, true)).get();
+      const completedFlags = await db
+        .select({
+          flags: count(),
+        })
+        .from(flagsSchema)
+        .where(eq(flagsSchema.completed, true))
+        .get();
 
-			return success(res, {
-				message: 'Correct flag',
-				completedFlags: completedFlags?.flags || 0
-			});
-		}
-	}
+      return success(res, {
+        message: 'Correct flag',
+        completedFlags: completedFlags?.flags || 0,
+      });
+    }
+  }
 
-	badRequest(res, {
-		message: 'Incorrect flag'
-	});
+  badRequest(res, {
+    message: 'Incorrect flag',
+  });
 };
 
 const router = Router();

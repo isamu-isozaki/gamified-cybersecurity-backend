@@ -1,24 +1,21 @@
-import ssh2 from 'ssh2';
+import { Server } from 'socket.io';
+import { onLabStart } from './lab.js';
 
-import { SSH_HOST, SSH_PORT, SSH_USER, SSH_PASS } from '../config/index.js';
-let ssh = new ssh2.Client();
-let isSshConnected = false;
+export default (server) => {
+  const io = new Server(server, {
+    cors: {
+      origin: '*', // 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+    },
+  });
 
-export async function sshConnect () {
-	return new Promise((res) => {
-		console.log('[ssh] Connecting to ssh...');
-		ssh.on('ready', () => {
-			console.log('[ssh] Connection established');
-			isSshConnected = true;
-			res();
-		}).on('error', (err) => {
-			console.error(`[ssh] Connection error: ${err?.message || err}`);
-			isSshConnected = false;
-		}).on('close', () => {
-			console.log('[ssh] Connection closed');
-			isSshConnected = false;
-		}).connect({ host: SSH_HOST, username: SSH_USER, password: SSH_PASS, port: SSH_PORT });
-	});
-}
+  io.on('connection', async (socket) => {
+    console.log('[socket] connected:', socket.id);
+    socket.on('labStart', (labName) => onLabStart(socket, labName));
 
-export { ssh as sshConnection, isSshConnected };
+    socket.on('disconnect', () => {
+      console.log('[socket] disconnected:', socket.id);
+      socket.removeAllListeners();
+    });
+  });
+};
