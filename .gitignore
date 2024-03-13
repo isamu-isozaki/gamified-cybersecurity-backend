@@ -10,8 +10,6 @@ npm-debug.log
 *.dev
 .DS_Store
 
-# Docker
-docker-compose.yml
 # Logs
 logs
 *.log
