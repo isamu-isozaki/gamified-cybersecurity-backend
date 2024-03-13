@@ -17,7 +17,7 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.c
 RUN apt-get update
 RUN apt-get install -y docker.io docker-compose-plugin
 
-RUN npm install
+RUN yarn install
 EXPOSE 10000
 CMD ["npm", "start"]
 
